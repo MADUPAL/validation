@@ -10,99 +10,59 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
 public class PostController {
-
     private final PostService postService;
 
-    private String getWriteFormHtml() {
-        return getWriteFormHtml("", "", "");
-    }
 
-    private String getWriteFormHtml(
-            String errorMessage,
-            String title,
-            String content
-    ) {
-        return """
-                <ul style="color: red;">
-                    %s
-                </ul>
-                
-                <form method="POST" action="doWrite">
-                  <input type="text" name="title" placeholder="제목" value="%s" autofocus>
-                  <br>
-                  <textarea name="content" placeholder="내용">%s</textarea>
-                  <br>
-                  <input type="submit" value="작성">
-                </form>
-                
-                <script>
-                    // 현재까지 나온 모든 폼 검색
-                    const forms = document.querySelectorAll('form');
-                    // 그 중에서 가장 마지막 폼 1개 찾기
-                    const lastForm = forms[forms.length - 1];
-                
-                    const errorFieldName =
-                      lastForm.previousElementSibling?.querySelector("li")?.dataset
-                        ?.errorFieldName || "";
-                
-                    if (errorFieldName.length > 0) {
-                      lastForm[errorFieldName].focus();
-                    }
-                </script>
-                """.formatted(errorMessage, title, content);
+    @ModelAttribute("siteName") //siteName이라는 템플릿 변수를 쓸 수 있다.
+    public String siteName() {
+        return "커뮤니티 사이트 A";
     }
-
-    @GetMapping("/posts/write")
-    @ResponseBody
-    public String showWrite() {
-        return getWriteFormHtml();
-    }
-
 
     @AllArgsConstructor
     @Getter
     public static class WriteForm {
-        @NotBlank(message = "1-제목을 입력해주세요.")
-        @Size(min = 2, max = 20, message = "2-제목은 2자 이상, 20자 이하로 입력가능합니다.")
+        @NotBlank(message = "1-title-제목을 입력해주세요.")
+        @Size(min = 2, max = 20, message = "2-title-제목은 2자 이상, 20자 이하로 입력가능합니다.")
         private String title;
-        @NotBlank(message = "3-내용을 입력해주세요.")
-        @Size(min = 2, max = 20, message = "4-내용은 2자 이상, 20자 이하로 입력가능합니다.")
+        @NotBlank(message = "3-content-내용을 입력해주세요.")
+        @Size(min = 2, max = 20, message = "4-content-내용은 2자 이상, 20자 이하로 입력가능합니다.")
         private String content;
     }
 
+    @GetMapping("/posts/write")
+    public String showWrite(@ModelAttribute("form") WriteForm form) {
+        // write.html은 form에 의존하고있기 때문에
+        // 비어있는 form이어도 오류가 나지 않게 하기 위해 넘겨줘야 한다.
+        return "post/post/write";
+    }
+
     @PostMapping("/posts/doWrite")
-    @ResponseBody
     @Transactional
     public String write(
-            @Valid WriteForm form,
-            BindingResult bindingResult
+            @ModelAttribute("form") @Valid WriteForm form,
+            BindingResult bindingResult,
+            Model model
     ) {
-
         if (bindingResult.hasErrors()) {
-            String errorMessage = bindingResult
-                    .getFieldErrors()
-                    .stream()
-                    .map(fieldError->(fieldError.getField() + "-" + fieldError.getDefaultMessage()).split("-", 3))
-                    .map(field-> "<!--%s--><li data-error-field-name=\"%s\">%s</li>".formatted(field[1], field[0], field[2]))
-                    .sorted()
-                    .collect(Collectors.joining("\n"));
 
-            return getWriteFormHtml(errorMessage, form.getTitle(), form.getContent());
+            return "post/post/write";
         }
 
         Post post = postService.write(form.getTitle(), form.getContent());
 
-        return "%d번 글이 생성되었습니다.".formatted(post.getId());
+        model.addAttribute("post", post);
+
+        return "post/post/writeDone";
     }
 }

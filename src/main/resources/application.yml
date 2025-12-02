@@ -8,14 +8,9 @@ spring:
       enabled: always
   thymeleaf:
     cache: false
-    prefix: file:src/main/resources/templates/
   datasource:
     hikari:
       auto-commit: false
-  mvc:
-    hiddenmethod:
-      filter:
-        enabled: true
   jpa:
     show-sql: true
     hibernate:

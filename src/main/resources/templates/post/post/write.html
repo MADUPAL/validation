@@ -1,0 +1,27 @@
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<h1 th:text="${siteName}"></h1>
+
+<form method="POST" action="doWrite" th:object="${form}"> <!--th:object 안에있는 것을 *{}으로 사용가능-->
+    <ul th:if="${#fields.hasAnyErrors()}"> <!--#은 th:object아래에서만 쓸 수 있다.-->
+<!--        <li data-error-field-name="${err.split('-', 3)[1]}" th:each="err : ${#fields.allErrors().stream().sorted()}" th:text="${err.split('-', 3)[2]}"-->
+<!--            style="color: red;"></li>-->
+        <li th:each="err : ${#fields.allErrors().stream().sorted()}"
+            th:with="errStrs = ${err.split('-', 3)},
+                    errFieldName = ${errStrs[1]},
+                    errMsg = ${errStrs[2]}"
+            th:data-error-field-name="${errFieldName}" th:text="${errMsg}"
+            style="color: red;"></li>
+    </ul>
+    <div>
+        <label for="title">제목</label><br> <!--id와 for가 일치해야함 또는 label로 감싸기 가능-->
+        <input type="text" placeholder="제목" autofocus th:field="*{title}">
+        <!--th:field는 id, name, value 자동으로 만들어줌-->
+    </div>
+    <div>
+        <label for="content">내용</label><br> <!--id와 for가 일치해야함 또는 label로 감싸기 가능-->
+        <textarea placeholder="내용" th:field="*{content}"></textarea>
+    </div>
+    <input type="submit" value="작성">
+</form>
+
+</html>
