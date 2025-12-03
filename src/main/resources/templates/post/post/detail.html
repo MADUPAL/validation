@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<h1 th:text="${siteName}"></h1>
+
+<h2>번호 : [[${post.id}]]</h2>
+
+<h2>제목 : [[${post.title}]]</h2>
+
+<h3>내용</h3>
+<div style="white-space: pre-line;">[[${post.content}]]</div>
+
+<div>
+    <a href=".">글 목록</a>
+    <a href="write">글 쓰기</a>
+    <a th:href="@{{id}/modify(id=${post.id})}">글 수정</a>
+    <!--id에 post.id가 들어감-->
+    <!--문자열과 자바 코드를 섞어쓰려면 ||를 써야함-->
+</div>
+</html>
