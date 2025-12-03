@@ -2,6 +2,9 @@ package com.validation.domain.post.post.service;
 
 import com.validation.domain.post.post.entity.Post;
 import com.validation.domain.post.post.repository.PostRepository;
+import com.validation.domain.post.postComment.entity.PostComment;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,5 +37,13 @@ public class PostService {
 
     public void modify(Post post, String title, String content) {
         post.modify(title, content);
+    }
+
+    public void writeComment(Post post, String content) {
+        post.addComment(content);
+    }
+
+    public boolean deleteComment(Post post, PostComment postComment) {
+        return post.deleteComment(postComment);
     }
 }
