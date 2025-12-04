@@ -23,22 +23,15 @@ public class PostController {
     private final PostService postService;
 
 
-    @ModelAttribute("siteName") //siteName이라는 템플릿 변수를 쓸 수 있다.
-    public String siteName() {
-        return "커뮤니티 사이트 A";
-    }
 
-    @AllArgsConstructor
-    @Getter
-    @Setter
-    public static class ModifyForm {
+    record ModifyForm (
         @NotBlank(message = "01-title-제목을 입력해주세요.")
         @Size(min = 2, max = 20, message = "02-title-제목은 2자 이상, 20자 이하로 입력가능합니다.")
-        private String title;
+        String title,
         @NotBlank(message = "03-content-내용을 입력해주세요.")
         @Size(min = 2, max = 20, message = "04-content-내용은 2자 이상, 20자 이하로 입력가능합니다.")
-        private String content;
-    }
+        String content
+    ){}
 
     @GetMapping("/posts/{id}/modify")
     public String showModify(
@@ -48,14 +41,12 @@ public class PostController {
     ) {
         Post post = postService.findById(id).get();
 
-        model.addAttribute("post", post);
-        form.setTitle(post.getTitle());
-        form.setContent(post.getContent());
+        model.addAttribute("post", new ModifyForm(post.getTitle(), post.getContent()));
 
         return "post/post/modify";
     }
 
-    @PostMapping("/posts/{id}/modify")
+    @PutMapping("/posts/{id}/modify")
     @Transactional
     public String modify(
             @PathVariable int id,
@@ -70,7 +61,7 @@ public class PostController {
             return "post/post/modify";
         }
 
-        postService.modify(post, form.getTitle(), form.getContent());
+        postService.modify(post, form.title, form.content);
 
         return "redirect:/posts/" + post.getId();
     }

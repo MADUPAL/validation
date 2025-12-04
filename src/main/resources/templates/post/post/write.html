@@ -1,26 +1,29 @@
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<h1 th:text="${siteName}"></h1>
+<html layout:decorate="~{layout}">
+<head>
+    <title>글 작성</title>
+</head>
+<div layout:fragment="content">
 
-<!--GET /posts/write-->
-<!--POST /posts/write http메서드가 다르기 때문에 같은 주소여도 다르게 매핑-->
-<!--action이 가리키는 주소가 현재 페이지라면 생략이 가능함-->
-<form method="POST" th:object="${form}"> <!--th:object 안에있는 것을 *{}으로 사용가능-->
-    <div th:replace="~{form_errors :: formErrorsFragment}"></div>
+    <!--GET /posts/write-->
+    <!--POST /posts/write http메서드가 다르기 때문에 같은 주소여도 다르게 매핑-->
+    <!--action이 가리키는 주소가 현재 페이지라면 생략이 가능함-->
+    <form method="POST" th:object="${form}"> <!--th:object 안에있는 것을 *{}으로 사용가능-->
+        <div th:replace="~{form_errors :: formErrorsFragment}"></div>
+
+        <div>
+            <label for="title">제목</label><br> <!--id와 for가 일치해야함 또는 label로 감싸기 가능-->
+            <input type="text" placeholder="제목" autofocus th:field="*{title}">
+            <!--th:field는 id, name, value 자동으로 만들어줌-->
+        </div>
+        <div>
+            <label for="content">내용</label><br> <!--id와 for가 일치해야함 또는 label로 감싸기 가능-->
+            <textarea placeholder="내용" th:field="*{content}"></textarea>
+        </div>
+        <input type="submit" value="작성">
+    </form>
 
     <div>
-        <label for="title">제목</label><br> <!--id와 for가 일치해야함 또는 label로 감싸기 가능-->
-        <input type="text" placeholder="제목" autofocus th:field="*{title}">
-        <!--th:field는 id, name, value 자동으로 만들어줌-->
+        <a href=".">글 목록</a>
     </div>
-    <div>
-        <label for="content">내용</label><br> <!--id와 for가 일치해야함 또는 label로 감싸기 가능-->
-        <textarea placeholder="내용" th:field="*{content}"></textarea>
-    </div>
-    <input type="submit" value="작성">
-</form>
-
-<div>
-    <a href=".">글 목록</a>
 </div>
-
 </html>
